@@ -1,9 +1,11 @@
 package edu.cnm.deepdive.atthemovies.controller;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import edu.cnm.deepdive.atthemovies.model.dao.ActorRepository;
 import edu.cnm.deepdive.atthemovies.model.dao.MovieRepository;
 import edu.cnm.deepdive.atthemovies.model.enity.Actor;
 import edu.cnm.deepdive.atthemovies.model.enity.Movie;
+import edu.cnm.deepdive.atthemovies.view.FlatActor;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -40,11 +42,13 @@ public class ActorController {
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @JsonSerialize(contentAs = FlatActor.class)
   public List<Actor> list(){
     return repository.getAllByOrderByName();
   }
 
   @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
+  @JsonSerialize(contentAs = FlatActor.class)
   public List<Actor> search(@RequestParam(value = "q", required = true) String nameFragment){
     return repository.getAllByNameContainsOrderByNameAsc(nameFragment);
   }
@@ -59,6 +63,13 @@ public ResponseEntity<Actor> post(@RequestBody Actor actor){
     return repository.findById(id).get();
   }
 
+  @DeleteMapping (value = "{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable("id") UUID id) {
+    repository.delete(get(id));
+  }
+
+
 
   @PutMapping(value = "{actorId}/movies/{movieId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public Actor attach(@PathVariable("actorId") UUID actordId, @PathVariable("movieId") UUID movieId){
@@ -69,6 +80,7 @@ public ResponseEntity<Actor> post(@RequestBody Actor actor){
     }
     return repository.save(actor);
   }
+
 
   @DeleteMapping(value = "{actorId}/movies/{movieId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
