@@ -18,7 +18,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -63,7 +65,8 @@ public class Movie implements FlatMovie {
 
   private String screenwriter;
 
-  @Enumerated(EnumType.STRING)
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "genre_id")
   private Genre genre;
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "movies", cascade = {CascadeType.DETACH,
@@ -133,8 +136,6 @@ public class Movie implements FlatMovie {
     Movie.entityLinks = entityLinks;
   }
 
-  public enum Genre {
-    ACTION, ROM_COM, HORROR, DOCUMENTARY, ANIME, SCI_FI, FANTASY
-  }
+
 
 }

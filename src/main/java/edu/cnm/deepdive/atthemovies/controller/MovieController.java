@@ -1,10 +1,11 @@
 package edu.cnm.deepdive.atthemovies.controller;
 
 import edu.cnm.deepdive.atthemovies.model.dao.ActorRepository;
+import edu.cnm.deepdive.atthemovies.model.dao.GenreRepository;
 import edu.cnm.deepdive.atthemovies.model.dao.MovieRepository;
 import edu.cnm.deepdive.atthemovies.model.enity.Actor;
+import edu.cnm.deepdive.atthemovies.model.enity.Genre;
 import edu.cnm.deepdive.atthemovies.model.enity.Movie;
-import edu.cnm.deepdive.atthemovies.model.enity.Movie.Genre;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -34,19 +35,23 @@ public class MovieController {
 
   private final MovieRepository repository;
   private final ActorRepository actorRepository;
+  private final GenreRepository genreRepository;
 
   @Autowired
   public MovieController(MovieRepository repository,
-      ActorRepository actorRepository) {
+      ActorRepository actorRepository,
+      GenreRepository genreRepository) {
     this.repository = repository;
     this.actorRepository = actorRepository;
+    this.genreRepository = genreRepository;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Movie> list(@RequestParam(name = "genre", required = false) Genre genre) {
-    if (genre == null) {
+  public List<Movie> list(@RequestParam(name = "genre", required = false) UUID genreId) {
+    if (genreId == null) {
       return repository.getAllByOrderByTitleAsc();
     } else {
+      Genre genre = genreRepository.findById(genreId).get();
       return repository.getAllByGenreOrderByTitleAsc(genre);
     }
   }
@@ -54,6 +59,15 @@ public class MovieController {
   @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Movie> search(@RequestParam(value = "q", required = true) String titleFragment){
     return repository.getAllByTitleContainsOrderByTitleAsc(titleFragment);
+  }
+
+  @PutMapping(value = "{id}",
+  consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public Movie put(@PathVariable("id") UUID id, @RequestBody Movie movie){
+    Movie exisitingMovie = repository.findById(id).get();
+    exisitingMovie.setScreenwriter((movie.getScreenwriter()));
+    exisitingMovie.setTitle(movie.getTitle());
+    return repository.save(exisitingMovie);
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

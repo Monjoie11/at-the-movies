@@ -1,8 +1,9 @@
 package edu.cnm.deepdive.atthemovies.view;
 
 import edu.cnm.deepdive.atthemovies.model.enity.Actor;
+import edu.cnm.deepdive.atthemovies.model.enity.Genre;
 import edu.cnm.deepdive.atthemovies.model.enity.Movie;
-import edu.cnm.deepdive.atthemovies.model.enity.Movie.Genre;
+
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
